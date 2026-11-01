@@ -67,7 +67,7 @@ function ContentPage() {
 
       <section className="rounded-2xl border bg-card p-5">
         <h2 className="mb-4 text-2xl">תמונה בראש האתר</h2>
-        <img src={vals.hero_image || heroDefault} alt="תמונת ראש האתר" className="aspect-[16/7] w-full max-w-2xl rounded-xl object-cover" />
+        <img src={vals["hero_image"] || heroDefault} alt="תמונת ראש האתר" className="aspect-[16/7] w-full max-w-2xl rounded-xl object-cover" />
         <div className="mt-4 flex flex-wrap gap-2">
           <Button asChild variant="secondary" disabled={busy}>
             <label className="cursor-pointer">
@@ -75,7 +75,7 @@ function ContentPage() {
               <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) onImage(f); e.target.value = ""; }} />
             </label>
           </Button>
-          {vals.hero_image && <Button variant="outline" onClick={resetImage} disabled={busy}>חזרה לתמונה המקורית</Button>}
+          {vals["hero_image"] && <Button variant="outline" onClick={resetImage} disabled={busy}>חזרה לתמונה המקורית</Button>}
         </div>
       </section>
 
