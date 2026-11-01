@@ -10,14 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as HowRouteImport } from './routes/how'
 import { Route as OrderRouteImport } from './routes/order'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as TrackTokenRouteImport } from './routes/track.$token'
 import { Route as ApiPublicJobsFollowupRouteImport } from './routes/api/public/jobs/followup'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowRoute = HowRouteImport.update({
@@ -29,6 +36,11 @@ const OrderRoute = OrderRouteImport.update({
   id: '/order',
   path: '/order',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const TrackTokenRoute = TrackTokenRouteImport.update({
   id: '/track/$token',
@@ -43,9 +55,11 @@ const ApiPublicJobsFollowupRoute = ApiPublicJobsFollowupRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/how': typeof HowRoute
   '/order': typeof OrderRoute
   '/track/$token': typeof TrackTokenRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRoutesByTo {
@@ -53,33 +67,51 @@ export interface FileRoutesByTo {
   '/how': typeof HowRoute
   '/order': typeof OrderRoute
   '/track/$token': typeof TrackTokenRoute
+  '/admin': typeof AdminIndexRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/how': typeof HowRoute
   '/order': typeof OrderRoute
   '/track/$token': typeof TrackTokenRoute
+  '/admin/': typeof AdminIndexRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/how' | '/order' | '/track/$token' | '/api/public/jobs/followup'
+    | '/'
+    | '/admin'
+    | '/how'
+    | '/order'
+    | '/track/$token'
+    | '/admin/'
+    | '/api/public/jobs/followup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/how' | '/order' | '/track/$token' | '/api/public/jobs/followup'
-  id:
-    | '__root__'
+  to:
     | '/'
     | '/how'
     | '/order'
     | '/track/$token'
+    | '/admin'
+    | '/api/public/jobs/followup'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/how'
+    | '/order'
+    | '/track/$token'
+    | '/admin/'
     | '/api/public/jobs/followup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   HowRoute: typeof HowRoute
   OrderRoute: typeof OrderRoute
   TrackTokenRoute: typeof TrackTokenRoute
@@ -95,6 +127,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/how': {
       id: '/how'
       path: '/how'
@@ -108,6 +147,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/order'
       preLoaderRoute: typeof OrderRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/track/$token': {
       id: '/track/$token'
@@ -126,8 +172,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   HowRoute: HowRoute,
   OrderRoute: OrderRoute,
   TrackTokenRoute: TrackTokenRoute,
