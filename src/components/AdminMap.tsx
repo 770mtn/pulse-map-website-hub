@@ -5,11 +5,14 @@ type Pt = { lat: number; lng: number; label: string; kind: "request" | "urgent" 
 declare global {
   interface Window {
     __gmapsReady?: () => void;
+    gm_authFailure?: () => void;
     google?: any;
   }
 }
 
 let loader: Promise<void> | null = null;
+const failListeners = new Set<() => void>();
+
 function loadMaps(): Promise<void> {
   if (window.google?.maps) return Promise.resolve();
   if (loader) return loader;
@@ -20,6 +23,7 @@ function loadMaps(): Promise<void> {
     const s = document.createElement("script");
     s.src = `https://maps.googleapis.com/maps/api/js?key=${key}&loading=async&callback=__gmapsReady&language=he&region=IL&channel=${ch}`;
     s.async = true;
+    s.onerror = () => failListeners.forEach((f) => f());
     document.head.appendChild(s);
   });
   return loader;
@@ -32,13 +36,28 @@ export function AdminMap({ points }: { points: Pt[] }) {
   const map = useRef<any>(null);
   const markers = useRef<any[]>([]);
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   useEffect(() => {
+    const mark = () => setFailed(true);
+    failListeners.add(mark);
+    const prev = window.gm_authFailure;
+    window.gm_authFailure = () => {
+      prev?.();
+      failListeners.forEach((f) => f());
+    };
+    const timer = setTimeout(() => {
+      if (!window.google?.maps) mark();
+    }, 12000);
     loadMaps().then(() => {
       if (!ref.current || map.current) return;
       map.current = new window.google.maps.Map(ref.current, { center: { lat: 31.8, lng: 35 }, zoom: 8, clickableIcons: false });
       setReady(true);
     });
+    return () => {
+      clearTimeout(timer);
+      failListeners.delete(mark);
+    };
   }, []);
 
   useEffect(() => {
@@ -57,6 +76,23 @@ export function AdminMap({ points }: { points: Pt[] }) {
       return m;
     });
   }, [ready, points]);
+
+  if (failed)
+    return (
+      <div className="rounded-2xl border border-dashed bg-card p-6 text-center">
+        <p className="text-lg text-primary">המפה לא נטענה</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          כתובת האתר עדיין לא מאושרת לשימוש במפת Google. יש להוסיף אותה לרשימת ה־
+          <span dir="ltr">HTTP referrers</span> של מפתח ה־API.
+        </p>
+        <p dir="ltr" className="mx-auto mt-3 inline-block rounded-lg bg-secondary px-3 py-1 font-mono text-sm">
+          {window.location.origin}
+        </p>
+        <p className="mt-3 text-sm text-muted-foreground">
+          שאר המערכת עובדת כרגיל – אפשר לערוך בקשות, פעילים, מוצרים והגדרות.
+        </p>
+      </div>
+    );
 
   return (
     <div>
