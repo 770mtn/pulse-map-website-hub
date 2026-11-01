@@ -23,9 +23,12 @@ function Products() {
 
   async function upload(file: File) {
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = () => { setF((x) => x && { ...x, image_url: String(reader.result) }); setUploading(false); };
-    reader.readAsDataURL(file);
+    const path = `${crypto.randomUUID()}-${file.name.replace(/[^\w.]/g, "")}`;
+    const { error } = await supabase.storage.from("product-images").upload(path, file);
+    setUploading(false);
+    if (error) return toast.error(error.message);
+    const url = supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
+    setF((x) => x && { ...x, image_url: url });
   }
   async function save() {
     if (!f) return;

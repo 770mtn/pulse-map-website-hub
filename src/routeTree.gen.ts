@@ -14,6 +14,9 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as HowRouteImport } from './routes/how'
 import { Route as OrderRouteImport } from './routes/order'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminActivistsRouteImport } from './routes/admin.activists'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
 import { Route as TrackTokenRouteImport } from './routes/track.$token'
 import { Route as ApiPublicJobsFollowupRouteImport } from './routes/api/public/jobs/followup'
 
@@ -42,6 +45,21 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminActivistsRoute = AdminActivistsRouteImport.update({
+  id: '/activists',
+  path: '/activists',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRequestsRoute = AdminRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AdminRoute,
+} as any)
 const TrackTokenRoute = TrackTokenRouteImport.update({
   id: '/track/$token',
   path: '/track/$token',
@@ -58,6 +76,9 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/how': typeof HowRoute
   '/order': typeof OrderRoute
+  '/admin/activists': typeof AdminActivistsRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/track/$token': typeof TrackTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
@@ -66,6 +87,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/how': typeof HowRoute
   '/order': typeof OrderRoute
+  '/admin/activists': typeof AdminActivistsRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/track/$token': typeof TrackTokenRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
@@ -76,6 +100,9 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/how': typeof HowRoute
   '/order': typeof OrderRoute
+  '/admin/activists': typeof AdminActivistsRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/requests': typeof AdminRequestsRoute
   '/track/$token': typeof TrackTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
@@ -87,6 +114,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/how'
     | '/order'
+    | '/admin/activists'
+    | '/admin/products'
+    | '/admin/requests'
     | '/track/$token'
     | '/admin/'
     | '/api/public/jobs/followup'
@@ -95,6 +125,9 @@ export interface FileRouteTypes {
     | '/'
     | '/how'
     | '/order'
+    | '/admin/activists'
+    | '/admin/products'
+    | '/admin/requests'
     | '/track/$token'
     | '/admin'
     | '/api/public/jobs/followup'
@@ -104,6 +137,9 @@ export interface FileRouteTypes {
     | '/admin'
     | '/how'
     | '/order'
+    | '/admin/activists'
+    | '/admin/products'
+    | '/admin/requests'
     | '/track/$token'
     | '/admin/'
     | '/api/public/jobs/followup'
@@ -155,6 +191,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/activists': {
+      id: '/admin/activists'
+      path: '/activists'
+      fullPath: '/admin/activists'
+      preLoaderRoute: typeof AdminActivistsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/requests': {
+      id: '/admin/requests'
+      path: '/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AdminRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/track/$token': {
       id: '/track/$token'
       path: '/track/$token'
@@ -173,10 +230,16 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminActivistsRoute: typeof AdminActivistsRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+  AdminRequestsRoute: typeof AdminRequestsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivistsRoute: AdminActivistsRoute,
+  AdminProductsRoute: AdminProductsRoute,
+  AdminRequestsRoute: AdminRequestsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

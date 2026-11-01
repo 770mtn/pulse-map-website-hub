@@ -53,3 +53,29 @@ export const sendTestSms = createServerFn({ method: "POST" })
     const { sendSms } = await import("./sms.server");
     return { ok: await sendSms(supabaseAdmin, data.phone, "הודעת בדיקה ממערכת ההפצה", "test") };
   });
+
+export const listTeam = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("רק מנהל ראשי");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roles } = await supabaseAdmin.from("user_roles").select("user_id, role");
+    const { data: users } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+    return (users?.users ?? []).map((u) => ({ id: u.id, email: u.email ?? "", roles: (roles ?? []).filter((r) => r.user_id === u.id).map((r) => r.role) }));
+  });
+
+export const setUserRole = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { userId: string; role: "admin" | "area_manager" | "staff" | "none" }) =>
+    z.object({ userId: z.string().uuid(), role: z.enum(["admin", "area_manager", "staff", "none"]) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    if (!isAdmin) throw new Error("רק מנהל ראשי");
+    if (data.userId === context.userId) throw new Error("לא ניתן לשנות את ההרשאה של עצמך");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
+    if (data.role !== "none") await supabaseAdmin.from("user_roles").insert({ user_id: data.userId, role: data.role });
+    return { ok: true };
+  });
