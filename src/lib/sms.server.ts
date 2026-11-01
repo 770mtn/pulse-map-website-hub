@@ -8,20 +8,61 @@ function esc(s: string) {
 
 export function smsConfigured() {
   return Boolean(
-    process.env["PULSEEM_USER_ID"] && process.env["PULSEEM_PASSWORD"] && process.env["PULSEEM_FROM_NUMBER"],
+    process.env["PULSEEM_FROM_NUMBER"] &&
+      (process.env["PULSEEM_API_KEY"] || (process.env["PULSEEM_USER_ID"] && process.env["PULSEEM_PASSWORD"])),
   );
 }
 
-/** Sends one SMS through Pulseem (direct-send web service) and logs it. */
+/** Sends one SMS through Pulseem and logs it. Prefers the REST API key. */
 export async function sendSms(
   admin: SupabaseClient<Database>,
   to: string,
   body: string,
   kind: string,
 ): Promise<boolean> {
+  const apiKey = process.env["PULSEEM_API_KEY"];
   const user = process.env["PULSEEM_USER_ID"];
   const pass = process.env["PULSEEM_PASSWORD"];
   const from = process.env["PULSEEM_FROM_NUMBER"];
+  if (apiKey && from) {
+    try {
+      const res = await fetch("https://api.pulseem.com/api/v1/SmsApi/SendSms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", APIKey: apiKey },
+        body: JSON.stringify({
+          sendId: crypto.randomUUID(),
+          isAsync: false,
+          smsSendData: {
+            fromNumber: from,
+            toNumberList: [to],
+            referenceList: [kind],
+            textList: [body],
+            isAutomaticUnsubscribeLink: false,
+          },
+        }),
+      });
+      const text = await res.text();
+      let ok = res.ok;
+      try {
+        const j = JSON.parse(text);
+        if (j && typeof j === "object" && "status" in j) ok = ok && /success/i.test(String(j.status));
+        if (j && j.error) ok = false;
+      } catch {
+        /* non-JSON response */
+      }
+      await admin.from("sms_log").insert({
+        to_phone: to,
+        body,
+        kind,
+        status: ok ? "sent" : "failed",
+        response: `[REST ${res.status}] ${text.slice(0, 500)}`,
+      });
+      return ok;
+    } catch (e) {
+      await admin.from("sms_log").insert({ to_phone: to, body, kind, status: "failed", response: String(e) });
+      return false;
+    }
+  }
   if (!user || !pass || !from) {
     await admin.from("sms_log").insert({ to_phone: to, body, kind, status: "not_configured" });
     return false;
