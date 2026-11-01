@@ -42,7 +42,7 @@ function Products() {
     if (!f) return;
     const { id, ...row } = f;
     const { error } = id ? await supabase.from("products").update(row).eq("id", id) : await supabase.from("products").insert(row);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("נשמר");
     setF(null);
     qc.invalidateQueries({ queryKey: ["admin-products"] });

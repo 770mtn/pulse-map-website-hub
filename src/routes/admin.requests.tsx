@@ -79,7 +79,7 @@ function RequestDetail({ r, onSaved }: { r: any; onSaved: () => void }) {
   });
   async function save() {
     const { error } = await supabase.from("requests").update({ status, urgent, admin_notes: notes, updated_at: new Date().toISOString() }).eq("id", r.id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     if (status !== r.status) await supabase.from("request_events").insert({ request_id: r.id, event: `סטטוס שונה ל: ${STATUSES[status]}` });
     toast.success("נשמר");
     onSaved(); refetch();

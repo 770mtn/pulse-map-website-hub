@@ -63,8 +63,8 @@ function Templates() {
   const { data } = useQuery({ queryKey: ["templates"], queryFn: async () => (await supabase.from("sms_templates").select("*").order("key")).data ?? [] });
   const [edits, setEdits] = useState<Record<string, string>>({});
   async function save(key: string) {
-    const { error } = await supabase.from("sms_templates").update({ body: edits[key] }).eq("key", key);
-    if (error) return toast.error(error.message);
+    const { error } = await supabase.from("sms_templates").update({ body: edits[key] ?? "" }).eq("key", key);
+    if (error) { toast.error(error.message); return; }
     toast.success("נשמר");
     qc.invalidateQueries({ queryKey: ["templates"] });
   }

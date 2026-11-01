@@ -18,7 +18,7 @@ describe("pickActivists", () => {
   });
   it("prefers installers when installation is requested", () => {
     const l = list.map((a) => (a.id === "d" ? { ...a, does_install: true } : a));
-    expect(pickActivists(l, point, 3, true)[0].id).toBe("d");
+    expect(pickActivists(l, point, 3, true)[0]?.id).toBe("d");
   });
   it("excludes activists outside their service radius", () => {
     expect(pickActivists(list, point, 10, false).map((a) => a.id)).not.toContain("far");

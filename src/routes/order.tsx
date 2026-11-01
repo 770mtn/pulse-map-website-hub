@@ -52,7 +52,7 @@ function OrderPage() {
   const verifyFn = useServerFn(verifyOtp);
   const submitFn = useServerFn(submitRequest);
 
-  const items = orderable.filter((p) => (qty[p.id] ?? 0) > 0).map((p) => ({ productId: p.id, name: p.name, quantity: qty[p.id] }));
+  const items = orderable.filter((p) => (qty[p.id] ?? 0) > 0).map((p) => ({ productId: p.id, name: p.name, quantity: qty[p.id] ?? 0 }));
   const anyInstallable = items.some((i) => orderable.find((p) => p.id === i.productId)?.installable);
   const canReview = name.trim().length >= 2 && token && place && items.length > 0 && (!anyInstallable || install !== null);
 

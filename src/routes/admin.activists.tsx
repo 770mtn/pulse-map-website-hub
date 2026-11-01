@@ -27,17 +27,17 @@ function Activists() {
 
   async function save() {
     if (!form) return;
-    if (!isValidIsraeliPhone(form.phone)) return toast.error("טלפון לא תקין");
+    if (!isValidIsraeliPhone(form.phone)) { toast.error("טלפון לא תקין"); return; }
     let f = { ...form, phone: normalizePhone(form.phone) };
     try {
       if (f.address && (f.lat == null || f.address !== data?.find((a) => a.id === f.id)?.address)) {
         const g = await geocode({ data: { address: f.address } });
         f = { ...f, address: g.address, lat: g.lat, lng: g.lng, city: f.city || g.city };
       }
-    } catch (e) { return toast.error(e instanceof Error ? e.message : "שגיאת כתובת"); }
+    } catch (e) { { toast.error(e instanceof Error ? e.message : "שגיאת כתובת"); return; } }
     const { id, ...row } = f;
     const { error } = id ? await supabase.from("activists").update(row).eq("id", id) : await supabase.from("activists").insert(row);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("נשמר");
     setForm(null);
     qc.invalidateQueries({ queryKey: ["activists"] });
