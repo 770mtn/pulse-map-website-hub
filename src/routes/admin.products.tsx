@@ -23,12 +23,20 @@ function Products() {
 
   async function upload(file: File) {
     setUploading(true);
-    const path = `${crypto.randomUUID()}-${file.name.replace(/[^\w.]/g, "")}`;
-    const { error } = await supabase.storage.from("product-images").upload(path, file);
-    setUploading(false);
-    if (error) return toast.error(error.message);
-    const url = supabase.storage.from("product-images").getPublicUrl(path).data.publicUrl;
-    setF((x) => x && { ...x, image_url: url });
+    try {
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(1, 900 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(bmp.width * scale);
+      c.height = Math.round(bmp.height * scale);
+      c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
+      const url = c.toDataURL("image/jpeg", 0.8);
+      setF((x) => x && { ...x, image_url: url });
+    } catch {
+      toast.error("לא ניתן לטעון את התמונה");
+    } finally {
+      setUploading(false);
+    }
   }
   async function save() {
     if (!f) return;
