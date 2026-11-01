@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HowRouteImport } from './routes/how'
+import { Route as OrderRouteImport } from './routes/order'
+import { Route as TrackTokenRouteImport } from './routes/track.$token'
 import { Route as ApiPublicJobsFollowupRouteImport } from './routes/api/public/jobs/followup'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +25,16 @@ const HowRoute = HowRouteImport.update({
   path: '/how',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrderRoute = OrderRouteImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrackTokenRoute = TrackTokenRouteImport.update({
+  id: '/track/$token',
+  path: '/track/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicJobsFollowupRoute = ApiPublicJobsFollowupRouteImport.update({
   id: '/api/public/jobs/followup',
   path: '/api/public/jobs/followup',
@@ -32,30 +44,45 @@ const ApiPublicJobsFollowupRoute = ApiPublicJobsFollowupRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/how': typeof HowRoute
+  '/order': typeof OrderRoute
+  '/track/$token': typeof TrackTokenRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/how': typeof HowRoute
+  '/order': typeof OrderRoute
+  '/track/$token': typeof TrackTokenRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/how': typeof HowRoute
+  '/order': typeof OrderRoute
+  '/track/$token': typeof TrackTokenRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/how' | '/api/public/jobs/followup'
+  fullPaths:
+    '/' | '/how' | '/order' | '/track/$token' | '/api/public/jobs/followup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/how' | '/api/public/jobs/followup'
-  id: '__root__' | '/' | '/how' | '/api/public/jobs/followup'
+  to: '/' | '/how' | '/order' | '/track/$token' | '/api/public/jobs/followup'
+  id:
+    | '__root__'
+    | '/'
+    | '/how'
+    | '/order'
+    | '/track/$token'
+    | '/api/public/jobs/followup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HowRoute: typeof HowRoute
+  OrderRoute: typeof OrderRoute
+  TrackTokenRoute: typeof TrackTokenRoute
   ApiPublicJobsFollowupRoute: typeof ApiPublicJobsFollowupRoute
 }
 
@@ -75,6 +102,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HowRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/order': {
+      id: '/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/track/$token': {
+      id: '/track/$token'
+      path: '/track/$token'
+      fullPath: '/track/$token'
+      preLoaderRoute: typeof TrackTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/jobs/followup': {
       id: '/api/public/jobs/followup'
       path: '/api/public/jobs/followup'
@@ -88,6 +129,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HowRoute: HowRoute,
+  OrderRoute: OrderRoute,
+  TrackTokenRoute: TrackTokenRoute,
   ApiPublicJobsFollowupRoute: ApiPublicJobsFollowupRoute,
 }
 export const routeTree = rootRouteImport
