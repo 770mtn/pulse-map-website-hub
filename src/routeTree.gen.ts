@@ -10,33 +10,160 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as HowRouteImport } from './routes/how'
+import { Route as OrderRouteImport } from './routes/order'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminActivistsRouteImport } from './routes/admin.activists'
+import { Route as AdminProductsRouteImport } from './routes/admin.products'
+import { Route as AdminRequestsRouteImport } from './routes/admin.requests'
+import { Route as AdminSettingsRouteImport } from './routes/admin.settings'
+import { Route as TrackTokenRouteImport } from './routes/track.$token'
+import { Route as ApiPublicJobsFollowupRouteImport } from './routes/api/public/jobs/followup'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowRoute = HowRouteImport.update({
+  id: '/how',
+  path: '/how',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrderRoute = OrderRouteImport.update({
+  id: '/order',
+  path: '/order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminActivistsRoute = AdminActivistsRouteImport.update({
+  id: '/activists',
+  path: '/activists',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProductsRoute = AdminProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRequestsRoute = AdminRequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const TrackTokenRoute = TrackTokenRouteImport.update({
+  id: '/track/$token',
+  path: '/track/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicJobsFollowupRoute = ApiPublicJobsFollowupRouteImport.update({
+  id: '/api/public/jobs/followup',
+  path: '/api/public/jobs/followup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/how': typeof HowRoute
+  '/order': typeof OrderRoute
+  '/admin/activists': typeof AdminActivistsRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/track/$token': typeof TrackTokenRoute
+  '/admin/': typeof AdminIndexRoute
+  '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/how': typeof HowRoute
+  '/order': typeof OrderRoute
+  '/admin/activists': typeof AdminActivistsRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/track/$token': typeof TrackTokenRoute
+  '/admin': typeof AdminIndexRoute
+  '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/how': typeof HowRoute
+  '/order': typeof OrderRoute
+  '/admin/activists': typeof AdminActivistsRoute
+  '/admin/products': typeof AdminProductsRoute
+  '/admin/requests': typeof AdminRequestsRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/track/$token': typeof TrackTokenRoute
+  '/admin/': typeof AdminIndexRoute
+  '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/how'
+    | '/order'
+    | '/admin/activists'
+    | '/admin/products'
+    | '/admin/requests'
+    | '/admin/settings'
+    | '/track/$token'
+    | '/admin/'
+    | '/api/public/jobs/followup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/how'
+    | '/order'
+    | '/admin/activists'
+    | '/admin/products'
+    | '/admin/requests'
+    | '/admin/settings'
+    | '/track/$token'
+    | '/admin'
+    | '/api/public/jobs/followup'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/how'
+    | '/order'
+    | '/admin/activists'
+    | '/admin/products'
+    | '/admin/requests'
+    | '/admin/settings'
+    | '/track/$token'
+    | '/admin/'
+    | '/api/public/jobs/followup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  HowRoute: typeof HowRoute
+  OrderRoute: typeof OrderRoute
+  TrackTokenRoute: typeof TrackTokenRoute
+  ApiPublicJobsFollowupRoute: typeof ApiPublicJobsFollowupRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +175,104 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how': {
+      id: '/how'
+      path: '/how'
+      fullPath: '/how'
+      preLoaderRoute: typeof HowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/order': {
+      id: '/order'
+      path: '/order'
+      fullPath: '/order'
+      preLoaderRoute: typeof OrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/activists': {
+      id: '/admin/activists'
+      path: '/activists'
+      fullPath: '/admin/activists'
+      preLoaderRoute: typeof AdminActivistsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/products': {
+      id: '/admin/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminProductsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/requests': {
+      id: '/admin/requests'
+      path: '/requests'
+      fullPath: '/admin/requests'
+      preLoaderRoute: typeof AdminRequestsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/track/$token': {
+      id: '/track/$token'
+      path: '/track/$token'
+      fullPath: '/track/$token'
+      preLoaderRoute: typeof TrackTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/jobs/followup': {
+      id: '/api/public/jobs/followup'
+      path: '/api/public/jobs/followup'
+      fullPath: '/api/public/jobs/followup'
+      preLoaderRoute: typeof ApiPublicJobsFollowupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface AdminRouteChildren {
+  AdminActivistsRoute: typeof AdminActivistsRoute
+  AdminProductsRoute: typeof AdminProductsRoute
+  AdminRequestsRoute: typeof AdminRequestsRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminActivistsRoute: AdminActivistsRoute,
+  AdminProductsRoute: AdminProductsRoute,
+  AdminRequestsRoute: AdminRequestsRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
+  HowRoute: HowRoute,
+  OrderRoute: OrderRoute,
+  TrackTokenRoute: TrackTokenRoute,
+  ApiPublicJobsFollowupRoute: ApiPublicJobsFollowupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
