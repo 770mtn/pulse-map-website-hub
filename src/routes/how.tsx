@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteLayout } from "@/components/SiteLayout";
+import { siteContentQuery, useSiteContent } from "@/lib/site-content";
 
 export const Route = createFileRoute("/how")({
   head: () => ({
@@ -12,22 +13,17 @@ export const Route = createFileRoute("/how")({
       { name: "twitter:card", content: "summary" },
     ],
   }),
+  loader: ({ context }) => context.queryClient.ensureQueryData(siteContentQuery),
   component: How,
 });
 
-const steps = [
-  ["ממלאים בקשה", "בוחרים מוצרים, כמויות ואם רוצים התקנה."],
-  ["מאמתים טלפון", "מקבלים קוד ב-SMS ומזינים אותו – כדי שנוכל לחזור אליכם."],
-  ["בוחרים כתובת", "מקלידים את הכתובת ובוחרים מהרשימה."],
-  ["פעיל מהאזור מקבל הודעה", "שלושת הפעילים הקרובים אליכם מקבלים את פרטי הבקשה ב-SMS."],
-  ["הפעיל מתקשר ומגיע", "אחרי כמה ימים נשלח לכם הודעה לוודא שהכול הסתדר."],
-];
-
 function How() {
+  const t = useSiteContent();
+  const steps = ([1, 2, 3, 4, 5] as const).map((n) => [t[`how_step${n}_title`], t[`how_step${n}_text`]] as const);
   return (
     <SiteLayout>
       <div className="mx-auto max-w-3xl px-4 py-16">
-        <h1 className="text-center text-5xl text-primary">איך זה עובד?</h1>
+        <h1 className="text-center text-5xl text-primary">{t.how_title}</h1>
         <ol className="mt-12 space-y-6">
           {steps.map(([t, d], i) => (
             <li key={t} className="flex gap-5 rounded-2xl border bg-card p-5 shadow-sm">
@@ -40,7 +36,7 @@ function How() {
           ))}
         </ol>
         <div className="mt-12 text-center">
-          <Link to="/order" className="rounded-full bg-primary px-8 py-4 text-lg font-bold text-primary-foreground">אני רוצה להזמין</Link>
+          <Link to="/order" className="rounded-full bg-primary px-8 py-4 text-lg font-bold text-primary-foreground">{t.how_cta}</Link>
         </div>
       </div>
     </SiteLayout>

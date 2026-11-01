@@ -2,7 +2,7 @@ import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { toast } from "sonner";
-import { LayoutDashboard, ListChecks, LogOut, Package, Settings, Users } from "lucide-react";
+import { FileText, LayoutDashboard, ListChecks, LogOut, Package, Settings, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +55,7 @@ function AdminLayout() {
     { to: "/admin/requests", label: "בקשות", icon: ListChecks },
     { to: "/admin/activists", label: "פעילים", icon: Users },
     { to: "/admin/products", label: "מוצרים", icon: Package },
+    { to: "/admin/content", label: "טקסטים ותמונות", icon: FileText },
     { to: "/admin/settings", label: "הגדרות והודעות", icon: Settings },
   ] as const;
 
