@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HowRouteImport } from './routes/how'
 import { Route as ApiPublicJobsFollowupRouteImport } from './routes/api/public/jobs/followup'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowRoute = HowRouteImport.update({
+  id: '/how',
+  path: '/how',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicJobsFollowupRoute = ApiPublicJobsFollowupRouteImport.update({
@@ -25,27 +31,31 @@ const ApiPublicJobsFollowupRoute = ApiPublicJobsFollowupRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/how': typeof HowRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/how': typeof HowRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/how': typeof HowRoute
   '/api/public/jobs/followup': typeof ApiPublicJobsFollowupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/public/jobs/followup'
+  fullPaths: '/' | '/how' | '/api/public/jobs/followup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/public/jobs/followup'
-  id: '__root__' | '/' | '/api/public/jobs/followup'
+  to: '/' | '/how' | '/api/public/jobs/followup'
+  id: '__root__' | '/' | '/how' | '/api/public/jobs/followup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HowRoute: typeof HowRoute
   ApiPublicJobsFollowupRoute: typeof ApiPublicJobsFollowupRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how': {
+      id: '/how'
+      path: '/how'
+      fullPath: '/how'
+      preLoaderRoute: typeof HowRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/jobs/followup': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HowRoute: HowRoute,
   ApiPublicJobsFollowupRoute: ApiPublicJobsFollowupRoute,
 }
 export const routeTree = rootRouteImport
