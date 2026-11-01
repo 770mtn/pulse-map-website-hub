@@ -93,7 +93,7 @@ function Login() {
     try {
       const r = await adminPasswordLogin({ data: { password } });
       if (!r.ok) { toast.error("סיסמה שגויה"); return; }
-      const { error } = await supabase.auth.signInWithPassword({ email: r.email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email: r.email, password: r.accountPassword });
       if (error) toast.error(error.message);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "שגיאה");

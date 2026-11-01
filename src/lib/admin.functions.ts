@@ -91,16 +91,18 @@ export const adminPasswordLogin = createServerFn({ method: "POST" })
     const { createHash, timingSafeEqual } = await import("node:crypto");
     const h = (s: string) => createHash("sha256").update(s).digest();
     if (!timingSafeEqual(h(data.password), h(expected))) return { ok: false as const };
+    // Auth rejects short passwords, so the account uses a strong password derived from the shared one.
+    const accountPassword = "Hz!" + createHash("sha256").update("hineh-admin:" + expected).digest("hex").slice(0, 32);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: list } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
     let user = list?.users.find((u) => u.email === ADMIN_EMAIL);
     if (!user) {
-      const { data: c, error } = await supabaseAdmin.auth.admin.createUser({ email: ADMIN_EMAIL, password: expected, email_confirm: true });
+      const { data: c, error } = await supabaseAdmin.auth.admin.createUser({ email: ADMIN_EMAIL, password: accountPassword, email_confirm: true });
       if (error) throw new Error(error.message);
       user = c.user!;
     } else {
-      await supabaseAdmin.auth.admin.updateUserById(user.id, { password: expected });
+      await supabaseAdmin.auth.admin.updateUserById(user.id, { password: accountPassword });
     }
     await supabaseAdmin.from("user_roles").upsert({ user_id: user.id, role: "admin" }, { onConflict: "user_id,role", ignoreDuplicates: true });
-    return { ok: true as const, email: ADMIN_EMAIL };
+    return { ok: true as const, email: ADMIN_EMAIL, accountPassword };
   });
