@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { adminPasswordLogin } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin")({
   ssr: false,
@@ -84,32 +85,26 @@ function AdminLayout() {
 }
 
 function Login() {
-  const [mode, setMode] = useState<"in" | "up">("in");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { data, error } =
-      mode === "in"
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/admin` } });
-    setBusy(false);
-    if (error) { toast.error(error.message); return; }
-    if (mode === "up" && !data.session) toast.success("נשלח מייל אימות – אשרו אותו ואז התחברו");
+    try {
+      const r = await adminPasswordLogin({ data: { password } });
+      if (!r.ok) { toast.error("סיסמה שגויה"); return; }
+      const { error } = await supabase.auth.signInWithPassword({ email: r.email, password });
+      if (error) toast.error(error.message);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "שגיאה");
+    } finally { setBusy(false); }
   }
   return (
     <div className="flex min-h-screen items-center justify-center bg-hero px-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-4 rounded-2xl bg-card p-6 shadow-xl">
-        <h1 className="text-center text-3xl text-primary">{mode === "in" ? "כניסת צוות" : "הרשמת צוות"}</h1>
-        <div><Label htmlFor="email">אימייל</Label><Input id="email" type="email" dir="ltr" value={email} onChange={(e) => setEmail(e.target.value)} required /></div>
-        <div><Label htmlFor="pw">סיסמה</Label><Input id="pw" type="password" dir="ltr" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} /></div>
-        <Button className="w-full" disabled={busy}>{mode === "in" ? "כניסה" : "הרשמה"}</Button>
-        <button type="button" className="w-full text-sm text-muted-foreground underline" onClick={() => setMode(mode === "in" ? "up" : "in")}>
-          {mode === "in" ? "אין לך חשבון? הרשמה" : "יש לך חשבון? כניסה"}
-        </button>
-        <p className="text-center text-xs text-muted-foreground">החשבון הראשון שנרשם הופך אוטומטית למנהל ראשי.</p>
+        <h1 className="text-center text-3xl text-primary">כניסה לניהול</h1>
+        <div><Label htmlFor="pw">סיסמה</Label><Input id="pw" type="password" inputMode="numeric" dir="ltr" autoFocus value={password} onChange={(e) => setPassword(e.target.value)} required /></div>
+        <Button className="w-full" disabled={busy}>כניסה</Button>
       </form>
     </div>
   );

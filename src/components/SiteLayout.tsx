@@ -12,6 +12,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <span className="font-display text-xl">הנה זה משיח בא</span>
           </Link>
           <nav className="flex items-center gap-1 text-sm font-semibold sm:gap-3">
+            <Link to="/admin" className="rounded-md px-2 py-1 text-xs opacity-70 hover:text-gold hover:opacity-100">ניהול</Link>
             <Link to="/how" className="rounded-md px-2 py-1 hover:text-gold">איך זה עובד?</Link>
             <Link to="/order" className="rounded-full bg-gold px-4 py-2 text-accent-foreground shadow-gold hover:brightness-105">
               הגשת בקשה
