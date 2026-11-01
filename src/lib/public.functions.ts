@@ -39,9 +39,9 @@ export const sendOtp = createServerFn({ method: "POST" })
     if (!isValidIsraeliPhone(data.phone)) throw new Error("מספר טלפון לא תקין");
     const phone = normalizePhone(data.phone);
     const db = await admin();
-    const since = new Date(Date.now() - 3600_000).toISOString();
+    const since = new Date(Date.now() - 15 * 60_000).toISOString();
     const { count } = await db.from("phone_otps").select("id", { count: "exact", head: true }).eq("phone", phone).gte("created_at", since);
-    if ((count ?? 0) >= 4) throw new Error("נשלחו יותר מדי קודים. נסו שוב בעוד שעה");
+    if ((count ?? 0) >= 3) throw new Error("נשלחו יותר מדי קודים. נסו שוב בעוד רבע שעה");
     const code = String(Math.floor(100000 + Math.random() * 900000));
     await db.from("phone_otps").insert({ phone, code, expires_at: new Date(Date.now() + 10 * 60_000).toISOString() });
     const { sendTemplate, smsConfigured } = await import("./sms.server");
