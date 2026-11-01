@@ -260,11 +260,3 @@ export const respondTracking = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-/** Public, privacy-safe activist coverage points (rounded, no names). */
-export const getCoverage = createServerFn({ method: "GET" }).handler(async () => {
-  const db = await admin();
-  const { data: s } = await db.from("settings").select("show_public_map").eq("id", 1).single();
-  if (!s?.show_public_map) return [];
-  const { data } = await db.from("activists").select("lat, lng").eq("active", true).not("lat", "is", null);
-  return (data ?? []).map((a) => ({ lat: Math.round(a.lat! * 50) / 50, lng: Math.round(a.lng! * 50) / 50 }));
-});

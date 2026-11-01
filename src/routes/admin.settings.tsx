@@ -48,7 +48,6 @@ function GeneralSettings() {
         <div><Label>מספר פעילים לכל בקשה</Label><Input type="number" min={1} max={10} value={s.activists_per_request} onChange={(e) => setS({ ...s, activists_per_request: Number(e.target.value) })} /></div>
         <div><Label>ימי עסקים עד SMS מעקב</Label><Input type="number" min={1} max={30} value={s.followup_business_days} onChange={(e) => setS({ ...s, followup_business_days: Number(e.target.value) })} /></div>
         <div><Label>טלפון מנהל להתראות</Label><Input dir="ltr" value={s.admin_phone ?? ""} onChange={(e) => setS({ ...s, admin_phone: e.target.value })} /></div>
-        <label className="flex items-center gap-2 pt-6"><Switch checked={s.show_public_map} onCheckedChange={(v) => setS({ ...s, show_public_map: v })} /> הצגת מפת כיסוי פעילים למזמינים</label>
       </div>
       <Button className="mt-4" onClick={save}>שמירה</Button>
       <div className="mt-6 flex max-w-md gap-2">
