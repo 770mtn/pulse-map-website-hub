@@ -1,0 +1,39 @@
+
+name: Fix Bun Lockfile
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-lockfile:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Update lockfile
+        run: bun install
+
+      - name: Verify frozen lockfile
+        run: bun install --frozen-lockfile
+
+      - name: Commit updated lockfile
+        run: |
+          if git diff --quiet -- bun.lock; then
+            echo "No lockfile changes required"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bun.lock
+          git commit -m "Fix Bun lockfile"
+          git push origin main
