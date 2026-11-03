@@ -4,8 +4,13 @@ import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from './types'
 
+function isSupabaseServiceRoleKey(value: string): boolean {
+  return value.startsWith('sb_secret_');
+}
 
-
+function isJwtLike(value: string): boolean {
+  return value.split('.').length === 3 && value.split('.').every((part) => part.length > 0);
+}
 
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
@@ -33,7 +38,6 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
-    
     const SUPABASE_URL = process.env['SUPABASE_URL'];
     const SUPABASE_PUBLISHABLE_KEY = process.env['SUPABASE_PUBLISHABLE_KEY'];
 
@@ -46,13 +50,16 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       console.error(`[Supabase] ${message}`);
       throw new Error(message);
     }
-    
+
+    if (isSupabaseServiceRoleKey(SUPABASE_PUBLISHABLE_KEY)) {
+      throw new Error('Unauthorized: SUPABASE_PUBLISHABLE_KEY is configured with the service-role key; use the user publishable key for auth middleware.');
+    }
+
     const request = getRequest();
 
     if (!request?.headers) {
       throw new Error('Unauthorized: No request headers available');
     }
-
 
     const authHeader = request.headers.get('authorization');
 
@@ -69,8 +76,8 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: No token provided');
     }
 
-    if (token.split('.').length !== 3) {
-      throw new Error('Unauthorized: Invalid token');
+    if (!isJwtLike(token)) {
+      throw new Error('Unauthorized: Invalid Supabase user token');
     }
 
     const supabase = createClient<Database>(
@@ -93,7 +100,7 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
 
     const { data, error } = await supabase.auth.getClaims(token);
     if (error || !data?.claims) {
-      throw new Error('Unauthorized: Invalid token');
+      throw new Error('Unauthorized: Invalid or expired Supabase user token for this project');
     }
 
     if (!data.claims.sub) {
