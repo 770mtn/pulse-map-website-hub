@@ -59,8 +59,28 @@ function hasBackendKeys(env: unknown): boolean {
   return Boolean(fromProcess || e["SUPABASE_SERVICE_ROLE_KEY"]);
 }
 
+// Public (non-secret) connection values, used when a copy is deployed without its own env vars.
+const PUBLIC_ENV_DEFAULTS: Record<string, string> = {
+  SUPABASE_URL: "https://ohnrgdnhfglakuadxziy.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: "sb_publishable_WadmZq0HWTzSwoRRDJVeKg_61bKH7Ol",
+  SUPABASE_PROJECT_ID: "ohnrgdnhfglakuadxziy",
+};
+
+function applyPublicEnvDefaults(env: unknown) {
+  try {
+    if (typeof process === "undefined") return;
+    const e = (env ?? {}) as Record<string, unknown>;
+    for (const [k, v] of Object.entries(PUBLIC_ENV_DEFAULTS)) {
+      if (!process.env[k]) process.env[k] = typeof e[k] === "string" ? (e[k] as string) : v;
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    applyPublicEnvDefaults(env);
     try {
       const url = new URL(request.url);
       const isServerCall = url.pathname.startsWith("/_serverFn/") || url.pathname.startsWith("/api/");
