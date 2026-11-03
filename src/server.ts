@@ -44,9 +44,37 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+// Copies of this site deployed elsewhere (e.g. a user's own Cloudflare account via GitHub)
+// don't have the private backend keys. In that case, forward server calls to the main site.
+const MAIN_SITE = "https://pulse-map-website-hub.lovable.app";
+
+function hasBackendKeys(env: unknown): boolean {
+  const e = (env ?? {}) as Record<string, unknown>;
+  let fromProcess: string | undefined;
+  try {
+    fromProcess = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+  } catch {
+    fromProcess = undefined;
+  }
+  return Boolean(fromProcess || e["SUPABASE_SERVICE_ROLE_KEY"]);
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
+      const url = new URL(request.url);
+      const isServerCall = url.pathname.startsWith("/_serverFn/") || url.pathname.startsWith("/api/");
+      if (isServerCall && !hasBackendKeys(env) && !url.origin.startsWith(MAIN_SITE)) {
+        const target = MAIN_SITE + url.pathname + url.search;
+        const headers = new Headers(request.headers);
+        headers.delete("host");
+        return await fetch(target, {
+          method: request.method,
+          headers,
+          body: request.method === "GET" || request.method === "HEAD" ? null : await request.arrayBuffer(),
+          redirect: "manual",
+        });
+      }
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
       return await normalizeCatastrophicSsrResponse(response);
