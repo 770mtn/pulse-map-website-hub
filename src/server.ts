@@ -71,7 +71,7 @@ export default {
         return await fetch(target, {
           method: request.method,
           headers,
-          body: request.method === "GET" || request.method === "HEAD" ? undefined : await request.arrayBuffer(),
+          body: request.method === "GET" || request.method === "HEAD" ? null : await request.arrayBuffer(),
           redirect: "manual",
         });
       }
